@@ -1,7 +1,13 @@
 package com.yglong.sbms.admin.service.impl;
 
+import com.yglong.sbms.admin.dao.SysRoleMapper;
 import com.yglong.sbms.admin.dao.SysUserMapper;
+import com.yglong.sbms.admin.dao.SysUserRoleMapper;
+import com.yglong.sbms.admin.entity.SysMenu;
+import com.yglong.sbms.admin.entity.SysRole;
 import com.yglong.sbms.admin.entity.SysUser;
+import com.yglong.sbms.admin.entity.SysUserRole;
+import com.yglong.sbms.admin.service.SysMenuService;
 import com.yglong.sbms.admin.service.SysUserService;
 import com.yglong.sbms.common.utils.DateTimeUtils;
 import com.yglong.sbms.common.utils.PoiUtils;
@@ -14,48 +20,153 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class SysUserServiceImpl implements SysUserService {
     @Autowired
-    private SysUserMapper mapper;
+    private SysUserMapper sysUserMapper;
 
+    @Autowired
+    private SysMenuService sysMenuService;
+
+    @Autowired
+    private SysUserRoleMapper sysUserRoleMapper;
+
+    @Autowired
+    private SysRoleMapper sysRoleMapper;
+
+    /**
+     * 保存用户信息
+     * 新增或修改
+     * @param record
+     * @return
+     */
+    @Transactional
     @Override
     public int save(SysUser record) {
-        return mapper.insert(record);
+        Long id = null;
+        if (record.getId() == null || record.getId() == 0) {
+            // 新增
+            sysUserMapper.insertSelective(record);
+            id = record.getId();
+        } else {
+            // 修改
+            sysUserMapper.updateByPrimaryKeySelective(record);
+        }
+        // 更新用户角色
+        if (id != null && id == 0) {
+            return 1;
+        }
+        if (id != null) {
+            for (SysUserRole sysUserRole : record.getUserRoles()) {
+                sysUserRole.setUserId(id);
+            }
+        } else {
+            sysUserRoleMapper.deleteByPrimaryKey(record.getId());
+        }
+        for (SysUserRole sysUserRole : record.getUserRoles()) {
+            sysUserRoleMapper.insertSelective(sysUserRole);
+        }
+        return 1;
     }
 
     @Override
     public int delete(SysUser record) {
-        return mapper.deleteByPrimaryKey(record.getId());
+        return sysUserMapper.deleteByPrimaryKey(record.getId());
     }
 
     @Override
     public int delete(List<SysUser> records) {
         for (SysUser record : records) {
-            mapper.deleteByPrimaryKey(record.getId());
+            delete(record);
         }
         return 1;
     }
 
     @Override
     public SysUser findById(Long id) {
-        return mapper.selectByPrimaryKey(id);
+        return sysUserMapper.selectByPrimaryKey(id);
     }
 
     @Override
     public PageResult findPage(PageRequest pageRequest) {
-        return MyBatisPageHelper.findPage(pageRequest, mapper);
+        PageResult pageResult = null;
+        Object name = pageRequest.getParam("name");
+        Object email = pageRequest.getParam("email");
+        if (null != name) {
+            if (null != email) {
+                pageResult = MyBatisPageHelper.findPage(pageRequest, sysUserMapper, "findPageByNameAndEmail", name, email);
+            } else {
+                pageResult = MyBatisPageHelper.findPage(pageRequest, sysUserMapper, "findPageByName", name);
+            }
+        } else {
+            pageResult = MyBatisPageHelper.findPage(pageRequest, sysUserMapper);
+        }
+        findUserRoles(pageResult);
+        return pageResult;
+    }
+
+    /**
+     * 加载用户角色
+     * @param pageResult
+     */
+    private void findUserRoles(PageResult pageResult) {
+        List<?> content = pageResult.getContent();
+        for (Object object : content) {
+            SysUser sysUser = (SysUser) object;
+            List<SysUserRole> userRoles = findUserRoles(sysUser.getId());
+            sysUser.setUserRoles(userRoles);
+            sysUser.setRoleNames(getRoleNames(userRoles));
+        }
+    }
+
+    private String getRoleNames(List<SysUserRole> userRoles) {
+        StringBuilder sb = new StringBuilder();
+        for (SysUserRole userRole : userRoles) {
+            SysRole sysRole = sysRoleMapper.selectByPrimaryKey(userRole.getRoleId());
+            if (null == sysRole) {
+                continue;
+            }
+            sb.append(sysRole.getName());
+            sb.append(",");
+        }
+        sb.deleteCharAt(sb.length() - 1);
+        return sb.toString();
+    }
+
+    @Override
+    public List<SysUserRole> findUserRoles(Long userId) {
+        return sysUserRoleMapper.findUserRoles(userId);
     }
 
     @Override
     public File createUserExcelFile(PageRequest pageRequest) {
         PageResult pageResult = findPage(pageRequest);
         return createUserExcelFile(pageResult.getContent());
+    }
+
+    @Override
+    public SysUser findByName(String username) {
+        return sysUserMapper.findByName(username);
+    }
+
+    @Override
+    public Set<String> findPermissions(String username) {
+        Set<String> perms = new HashSet<>();
+        List<SysMenu> sysMenus = sysMenuService.findByUser(username);
+        for (SysMenu sysMenu : sysMenus) {
+            if (sysMenu.getPerms() != null && !"".equals(sysMenu.getPerms())) {
+                perms.add(sysMenu.getPerms());
+            }
+        }
+        return perms;
     }
 
     private static File createUserExcelFile(List<?> records) {

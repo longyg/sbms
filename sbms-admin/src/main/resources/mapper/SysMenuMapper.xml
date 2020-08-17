@@ -187,4 +187,20 @@
       del_flag = #{delFlag,jdbcType=TINYINT}
     where id = #{id,jdbcType=BIGINT}
   </update>
+
+  <select id="findAll" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List"/>
+    from sys_menu
+  </select>
+  <select id="findPage" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List"/>
+    from sys_menu
+  </select>
+  <select id="findByUsername" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select m.* from sys_menu m, sys_user u, sys_user_role ur, sys_role_menu rm
+    where where u.name = #{userName, jdbcType=VARCHAR} and u.id = ur.user_id
+    and ur.role_id = rm.role_id and rm.menu_id = m.id
+  </select>
 </mapper>

@@ -29,6 +29,11 @@
     select u.*, (select d.name from sys_dept d where u.dept_id = d.id) deptName from sys_user u
   </select>
 
+  <select id="findByName" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select u.*, (select d.name from sys_dept d where u.dept_id = d.id) deptName from sys_user u
+    where u.name = #{name, jdbcType=VARCHAR}
+  </select>
+
   <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
     select 
     <include refid="Base_Column_List" />

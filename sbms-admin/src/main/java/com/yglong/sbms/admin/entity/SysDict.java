@@ -2,8 +2,7 @@ package com.yglong.sbms.admin.entity;
 
 import java.util.Date;
 
-public class SysDict {
-    private Long id;
+public class SysDict extends BaseModel {
 
     private String value;
 
@@ -17,41 +16,10 @@ public class SysDict {
 
     private String remarks;
 
-    private String createBy;
-
-    private Date createTime;
-
-    private String lastUpdateBy;
-
-    private Date lastUpdateTime;
-
     private Byte delFlag;
-
-    public SysDict(Long id, String value, String label, String type, String description, Long sort, String remarks, String createBy, Date createTime, String lastUpdateBy, Date lastUpdateTime, Byte delFlag) {
-        this.id = id;
-        this.value = value;
-        this.label = label;
-        this.type = type;
-        this.description = description;
-        this.sort = sort;
-        this.remarks = remarks;
-        this.createBy = createBy;
-        this.createTime = createTime;
-        this.lastUpdateBy = lastUpdateBy;
-        this.lastUpdateTime = lastUpdateTime;
-        this.delFlag = delFlag;
-    }
 
     public SysDict() {
         super();
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public String getValue() {
@@ -100,38 +68,6 @@ public class SysDict {
 
     public void setRemarks(String remarks) {
         this.remarks = remarks == null ? null : remarks.trim();
-    }
-
-    public String getCreateBy() {
-        return createBy;
-    }
-
-    public void setCreateBy(String createBy) {
-        this.createBy = createBy == null ? null : createBy.trim();
-    }
-
-    public Date getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
-    }
-
-    public String getLastUpdateBy() {
-        return lastUpdateBy;
-    }
-
-    public void setLastUpdateBy(String lastUpdateBy) {
-        this.lastUpdateBy = lastUpdateBy == null ? null : lastUpdateBy.trim();
-    }
-
-    public Date getLastUpdateTime() {
-        return lastUpdateTime;
-    }
-
-    public void setLastUpdateTime(Date lastUpdateTime) {
-        this.lastUpdateTime = lastUpdateTime;
     }
 
     public Byte getDelFlag() {

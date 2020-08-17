@@ -2,6 +2,7 @@ package com.yglong.sbms.admin.dao;
 
 import com.yglong.sbms.admin.entity.SysUser;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -22,4 +23,6 @@ public interface SysUserMapper {
     List<SysUser> findAll();
 
     List<SysUser> findPage();
+
+    SysUser findByName(@Param(value = "name") String name);
 }

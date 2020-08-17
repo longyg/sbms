@@ -2,8 +2,7 @@ package com.yglong.sbms.admin.entity;
 
 import java.util.Date;
 
-public class SysLog {
-    private Long id;
+public class SysLog extends BaseModel {
 
     private String userName;
 
@@ -17,38 +16,8 @@ public class SysLog {
 
     private String ip;
 
-    private String createBy;
-
-    private Date createTime;
-
-    private String lastUpdateBy;
-
-    private Date lastUpdateTime;
-
-    public SysLog(Long id, String userName, String operation, String method, String params, Long time, String ip, String createBy, Date createTime, String lastUpdateBy, Date lastUpdateTime) {
-        this.id = id;
-        this.userName = userName;
-        this.operation = operation;
-        this.method = method;
-        this.params = params;
-        this.time = time;
-        this.ip = ip;
-        this.createBy = createBy;
-        this.createTime = createTime;
-        this.lastUpdateBy = lastUpdateBy;
-        this.lastUpdateTime = lastUpdateTime;
-    }
-
     public SysLog() {
         super();
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public String getUserName() {
@@ -97,37 +66,5 @@ public class SysLog {
 
     public void setIp(String ip) {
         this.ip = ip == null ? null : ip.trim();
-    }
-
-    public String getCreateBy() {
-        return createBy;
-    }
-
-    public void setCreateBy(String createBy) {
-        this.createBy = createBy == null ? null : createBy.trim();
-    }
-
-    public Date getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
-    }
-
-    public String getLastUpdateBy() {
-        return lastUpdateBy;
-    }
-
-    public void setLastUpdateBy(String lastUpdateBy) {
-        this.lastUpdateBy = lastUpdateBy == null ? null : lastUpdateBy.trim();
-    }
-
-    public Date getLastUpdateTime() {
-        return lastUpdateTime;
-    }
-
-    public void setLastUpdateTime(Date lastUpdateTime) {
-        this.lastUpdateTime = lastUpdateTime;
     }
 }

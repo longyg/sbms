@@ -1,5 +1,5 @@
 server:
-  port: 8081
+  port: 8001
 
 spring:
   datasource:
@@ -33,4 +33,4 @@ pagehelper:
   helperDialect: mysql
   reasonable: true
   supportMethodsArguments: true
-params: count=countSql
+  params: count=countSql
